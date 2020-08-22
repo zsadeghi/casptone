@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ping -c 1 server | grep docker_default | grep -E -o "[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+"
