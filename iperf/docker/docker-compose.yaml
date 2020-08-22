@@ -1,0 +1,10 @@
+version: "3.0"
+services:
+  server:
+    build: .
+    command: iperf3 -s -p 3000
+  client:
+    build: .
+    command: 'iperf3 -c server -i 1 -t 10 -V -p 3000  -b 1000000000000'
+    depends_on:
+      - server
