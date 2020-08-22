@@ -1,0 +1,25 @@
+#!/bin/bash
+
+iface=$1
+echo " + Preparing experiment ${iface}"
+echo " + Setting up the network interface"
+./chelper.sh "${iface}"
+config_file="$(tempfile)"
+echo " + Setting up the configuration file"
+cat ./pconfig.json | sed -E "s|%HERE%|$(pwd)|" | sed -E "s|%IFACE%|${iface}|" > "${config_file}"
+echo " + Setting up the rootfs image"
+rm -rf "rootfs-${iface}.ext4"
+cp image/rootfs.ext4 "rootfs-${iface}.ext4"
+echo " + Running the experiment"
+firecracker --no-api --config-file "${config_file}"
+echo " + Extracting experiment results"
+rm -rf "mnt-${iface}"
+rm -rf "exp-${iface}"
+mkdir "mnt-${iface}"
+mkdir "exp-${iface}"
+sudo mount "rootfs-${iface}.ext4" "mnt-${iface}"
+sudo cp -r ./mnt-${iface}/experiment/* exp-${iface}/
+sudo umount "mnt-${iface}"
+sudo chown -R zohreh:zohreh "exp-${iface}"
+echo " + Cleaning up"
+rm -rf "rootfs-${iface}.ext4"
